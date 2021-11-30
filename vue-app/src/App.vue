@@ -1,10 +1,18 @@
 <template>
-  <router-view />
+  <main>
+    <navbar class="mb-2" />
+    <router-view class="container px-2 pb-5 pt-2" />
+  </main>
 </template>
 
 <script>
+import navbar from './components/Navbar.vue';
+
 export default {
   name: 'App',
+  components: {
+    navbar,
+  }
 }
 </script>
 
@@ -13,8 +21,6 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
