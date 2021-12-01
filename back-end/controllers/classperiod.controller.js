@@ -8,5 +8,5 @@ module.exports = {
 function addClassPeriod(req, res, next) {
     classPeriodService.addClassPeriod(req.body.name)
         .then(() => res.send({}))
-        .catch((err) => res.sendStatus(500));
+        .catch((err) => res.status(500).send(err));
 };
