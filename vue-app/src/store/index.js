@@ -6,6 +6,7 @@ export default createStore({
         storage: window.sessionStorage,
     })],
     state: {
+        classPeriods: [],
         displayName: '',
     },
     mutations: {

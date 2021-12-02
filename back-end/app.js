@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
-
+const cors = require('cors');
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+app.use(cors());
 
 app.use('/class', require('./routes/classperiod.router'));
 app.use('/question', require('./routes/question.router'));

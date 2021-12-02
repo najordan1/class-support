@@ -39,6 +39,13 @@ export default {
     name: 'professor-view',
     setup() {
         const store = useStore();
+
+        // const addClassPeriod = (className) => {
+        //     axios.post('/class/add', {
+        //         name: className,
+        //     });
+        // };
+
         return { 
             name: computed(() => store.state.displayName),
             classPeriod: ref(null), // vue-multiselect needs null to start usually
