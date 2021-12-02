@@ -60,15 +60,17 @@ export default {
 
         const submit = () => {
             needsValidation.value = true;
-            // Return if invalid
+            // Return if invalid and display an error message
             if ((mode.value === 'student' && !displayName.value.length) || (mode.value === 'professor' && !password.value.length)) return;
             
             if (mode.value === 'student') {
                 store.dispatch('setDisplayName', { name: displayName.value });
+                // go to the student page
                 router.push({ name: 'student' });
             } else {
                 // TODO: add professor login
                 store.dispatch('setDisplayName', { name: 'Hammurabi' });
+                // go to the professor page
                 router.push({ name: 'professor' });
             }            
         };

@@ -13,6 +13,7 @@ function addQuestion(req, res, next) {
 };
 
 function getAllQuestions(req, res, next) {
+    // try query -- if successful then -- else catch and throw error
     questionService.getAllQuestions()
         .then((questions) => res.json(questions))
         .catch((err) => res.status(500).send(err));

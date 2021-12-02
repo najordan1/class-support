@@ -13,6 +13,7 @@ export default createStore({
             state.displayName = name;
         },
     },
+    // every other component can call actions
     actions: {
         setDisplayName({ commit }, { name }) {
             commit('setDisplayName', name);

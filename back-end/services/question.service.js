@@ -31,7 +31,7 @@ async function addQuestion(newQuestion) {
     if (await Question.findOne({ classPeriod, question: newQuestion.question })) {
         throw `Question: ${newQuestion.question} for class ${newQuestion.className} already exists`
     } 
-
+    
     const question = { ...newQuestion, classPeriod };
     delete question.className; //def a better way than deleting this property
     const dbquestion = new Question(question);
