@@ -29,17 +29,29 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import axios from 'axios';
 
 export default {
     name: 'student-view',
     setup() {
         const store = useStore();
+
+        const classOptions = ref([]);
+
+        const loadData = () => {
+            axios.get("/class/getAll")
+                .then((response) => {
+                    classOptions.value = response.data.map((item) => item.name);
+                })
+        }
+        onMounted(loadData);
+
         return { 
             name: computed(() => store.state.displayName),
             classPeriod: ref(null), // vue-multiselect needs null to start usually
-            classOptions: ['Class 15: B plus trees', 'Class 16: HW4 walkthrough'],
+            classOptions,
         };
     },
 };

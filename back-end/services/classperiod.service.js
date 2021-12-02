@@ -5,6 +5,7 @@ const ClassPeriod = db.ClassPeriod;
 // Functions that we return
 module.exports = {
     addClassPeriod,
+    getAllClassPeriods,
 };
 // Makes new entry into ClassPeriod
 // Controllers call these functions
@@ -15,4 +16,10 @@ async function addClassPeriod(name) {
     }
     const classPeriod = new ClassPeriod({ name });
     await classPeriod.save();
+};
+
+
+async function getAllClassPeriods() {
+    console.log('getting all class periods');
+    return await ClassPeriod.find();
 };
