@@ -1,6 +1,6 @@
 // connects to the database
 const db = require('../helpers/database');
-const student = db.student;
+const Student = db.Student;
 
 // Functions that we return
 module.exports = {
@@ -13,6 +13,6 @@ async function addStudent(firstName, lastName, PIN) {
     if (await addStudent.findOne({ firstName, lastName, PIN })) {
         throw `student: ${firstName, lastName, PIN} already exists`
     }
-    const student = new student({ firstName, lastName, PIN });
+    const student = new Student({ firstName, lastName, PIN });
     await student.save();
 };

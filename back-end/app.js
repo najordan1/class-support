@@ -5,6 +5,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 app.use('/class', require('./routes/classperiod.router'));
+app.use('/question', require('./routes/question.router'));
 app.get('/', (req, res) => {
     res.send('Hello World!')
 });
