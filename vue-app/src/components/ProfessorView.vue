@@ -13,7 +13,9 @@
                         <span>Questions will appear here</span>
                     </div>
                     <div class="card-footer d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary">Add</button>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+                            Add
+                        </button>
                     </div>
                 </div>
             </div>
@@ -28,17 +30,26 @@
                 </div>
             </div>
         </div>
+        <!-- Modal: -->
+        <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+            <create-modal />
+        </div>
     </div>
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import createModal from './CreateModal.vue';
 
 export default {
     name: 'professor-view',
+    components: {
+        createModal
+    },
     setup() {
         const store = useStore();
+        onMounted(() => store.dispatch('getClassPeriods'));
 
         // const addClassPeriod = (className) => {
         //     axios.post('/class/add', {
@@ -49,7 +60,7 @@ export default {
         return { 
             name: computed(() => store.state.displayName),
             classPeriod: ref(null), // vue-multiselect needs null to start usually
-            classOptions: ['Class 15: B plus trees', 'Class 16: HW4 walkthrough'],
+            classOptions: computed(() => store.state.classPeriods),
         };
     },
 };

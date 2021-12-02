@@ -16,71 +16,86 @@
                         </li>
                     </ul>
                 </div>
-                <div class="card-body">
-                    <form>
-                        <div v-if="mode === 'student'">
-                            <label for="name" class="form-label">Display Name</label>
-                            <input id="name" v-model="displayName" name="name" required type="text" :class="['form-control', {'is-invalid': needsValidation && !displayName.length}]">
-                            <div class="invalid-feedback">
-                                Please enter a display name.
-                            </div>
+                <Form v-show="mode === 'student'" novalidate autocomplete="off" :validation-schema="studentSchema" v-on:submit="submitStudent">
+                    <div class="card-body">
+                        <div class="form-group py-2">
+                            <label for="name">Display Name</label>
+                            <Field id="name" v-slot="{field, meta}" v-model="displayName" name="name">
+                                <input v-bind="field" :class="['form-control', {'is-invalid': meta.touched && !meta.valid}]" type="text" placeholder="e.g. Danny">
+                            </Field>
+                            <ErrorMessage name="name" class="invalid-feedback" />
                         </div>
-                        <div v-else-if="mode === 'professor'">
-                            <label for="username" class="form-label">Password</label>
-                            <input id="password" v-model="password" required name="password" type="password" :class="['form-control', {'is-invalid': needsValidation && !password.length}]">
-                            <div class="invalid-feedback">
-                                Please enter your password.
-                            </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Go</button>
+                    </div>
+                </Form>
+                <Form v-show="mode === 'professor'" novalidate autocomplete="off" :validation-schema="professorSchema" v-on:submit="login">
+                    <div class="card-body">
+                        <div class="form-group py-2">
+                            <label for="password">Password</label>
+                            <Field id="password" v-slot="{field, meta}" v-model="displayName" name="password">
+                                <input v-bind="field" :class="['form-control', {'is-invalid': meta.touched && !meta.valid}]" type="password">
+                            </Field>
+                            <ErrorMessage name="password" class="invalid-feedback" />
                         </div>
-                    </form>
-                </div>
-                <div class="card-footer d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary" v-on:click="submit">Go</button>
-                </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Log in</button>
+                    </div>
+                </Form>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import * as yup from 'yup';
+import { Form, Field, ErrorMessage } from 'vee-validate';
 
 export default {
     name: 'home',
+    components: {
+        Form,
+        Field,
+        ErrorMessage,
+    },
     setup() {
         const store = useStore();
         const router = useRouter();
 
         const mode = ref('student');
-        const needsValidation = ref(false);
         const displayName = ref('');
         const password = ref('');
 
-        const submit = () => {
-            needsValidation.value = true;
-            // Return if invalid and display an error message
-            if ((mode.value === 'student' && !displayName.value.length) || (mode.value === 'professor' && !password.value.length)) return;
-            
-            if (mode.value === 'student') {
-                store.dispatch('setDisplayName', { name: displayName.value });
-                // go to the student page
-                router.push({ name: 'student' });
-            } else {
-                // TODO: add professor login
-                store.dispatch('setDisplayName', { name: 'Hammurabi' });
-                // go to the professor page
-                router.push({ name: 'professor' });
-            }            
+        const studentSchema = computed(() => yup.object({
+            name: yup.string().required("Please enter a display name"),
+        }));
+        const professorSchema = computed(() => yup.object({
+            password: yup.string().required("Please enter your password"),
+        }))
+
+        const submitStudent = () => {
+            store.dispatch('setDisplayName', { name: displayName.value });
+            router.push({ name: 'student' }); // go to the student page
+        };
+        const login = () => {
+            // TODO: add professor login
+            store.dispatch('setDisplayName', { name: 'Hammurabi' });
+            router.push({ name: 'professor' }); // go to the professor page
         };
 
         return {
             displayName,
             mode,
-            needsValidation,
+            studentSchema,
             password,
-            submit,
+            professorSchema,
+            submitStudent,
+            login,
         };
     },
 };
