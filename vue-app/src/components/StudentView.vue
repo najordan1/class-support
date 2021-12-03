@@ -9,9 +9,13 @@
                     <div class="card-body">
                         <vue-multiselect id="test" v-model="classPeriod" :options="classOptions" placeholder="Select a class period" />
                     </div>
-                    <div class="card-body">
-                        <span>Questions will appear here</span>
+                    <div v-if="!classPeriod || !questions.length" class="card-body">
+                        <span v-if="!classPeriod">Please select a class</span>
+                        <span v-else>No questions found.</span>
                     </div>
+                    <ul v-else-if="questions.length" class="list-group list-group-flush">
+                        <li v-for="(question, index) in questions" :key="index" class="list-group-item">{{question}}</li>
+                    </ul>
                 </div>
             </div>
             <div class="col-xs-12 col-sm-8">
@@ -29,29 +33,25 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
-import axios from 'axios';
 
 export default {
     name: 'student-view',
     setup() {
         const store = useStore();
+        const classPeriod = ref(null); // vue-multiselect needs null to start usually
+        onMounted(() => store.dispatch('getClassPeriods'));
 
-        const classOptions = ref([]);
-
-        const loadData = () => {
-            axios.get("/class/getAll")
-                .then((response) => {
-                    classOptions.value = response.data.map((item) => item.name);
-                })
-        }
-        onMounted(loadData);
+        watch(classPeriod, (to, from) => {
+            if (to && to !== from) store.dispatch('getQuestions', { classPeriod: classPeriod.value });
+        });
 
         return { 
             name: computed(() => store.state.displayName),
-            classPeriod: ref(null), // vue-multiselect needs null to start usually
-            classOptions,
+            classPeriod,
+            classOptions: computed(() => store.state.classPeriods),
+            questions: computed(() => store.state.questions),
         };
     },
 };
