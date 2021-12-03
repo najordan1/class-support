@@ -59,12 +59,33 @@
                             <ErrorMessage name="responseType" class="invalid-feedback" />
                         </div>
                     </div>
-                    <div v-if="responseType === 'Multiple Choice' || responseType === 'Single Choice'" class="row py-2">
-                        <div class="form-group col">
-                            <label for="numOptions" class="form-label">Number of options *</label>
-                            <input id="numOptions" v-model="numOptions" name="numOptions" type="range" class="form-range" :min="2" :step="1" :max="5">
-                            <span class="form-text">Selected: {{numOptions}}</span>
+                    <div v-if="responseType === 'Multiple Choice' || responseType === 'Single Choice'">
+                        <div class="row py-2">
+                            <div class="form-group col">
+                                <label for="numOptions" class="form-label">Number of options *</label>
+                                <Field id="numOptions" v-slot="{field, meta}" v-model="numOptions" name="numOptions">
+                                    <input v-bind="field" :class="['form-range', {'is-invalid': meta.touched && !meta.valid}]" type="range" :min="2" :step="1" :max="5">
+                                </Field>
+                                <span class="form-text">Selected: {{numOptions}}</span>
+                            </div>
+                            <div class="form-group col">
+                                <label for="correctAnswer" class="form-label">Correct Answer (optional)</label>
+                                <Field id="correctAnswer" v-slot="{value, handleChange, meta}" v-model="correctAnswer" name="correctAnswer">
+                                    <vue-multiselect :model-value="value" :options="correctAnswerOptions" open-direction="bottom" :class="[{'is-invalid': meta.touched && !meta.valid}]" v-on:update:model-value="handleChange" />
+                                </Field>
+                                <ErrorMessage name="correctAnswer" />
+                            </div>
                         </div>
+                        <div class="row">
+                            <div v-for="(option, index) in correctAnswerOptions" :key="index" class="form-group col-6 py-2">
+                                <label :for="`option${index+1}`" class="form-label">{{option}} *</label>
+                                <Field :id="`option${index+1}`" v-slot="{field, meta}" v-model="choices[index]" :name="`option${index+1}`">
+                                    <input v-bind="field" :class="['form-control', {'is-invalid': meta.touched && !meta.valid}]" type="text">
+                                </Field>
+                                <ErrorMessage :name="`option${index+1}`" class="invalid-feedback" />
+                            </div>
+                        </div>
+                        <span class="form-text">* denotes a required field</span>
                     </div>
                     <button type="submit" class="btn btn-primary">Create</button>
                 </Form>
@@ -74,7 +95,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
 import * as yup from 'yup';
 import { Form, Field, ErrorMessage } from 'vee-validate';
@@ -94,6 +115,14 @@ export default {
         const status = ref(null);
         const question = ref('');
         const numOptions = ref(4);
+        const answerOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5'];
+        const correctAnswer = ref(null);
+        const correctAnswerOptions = computed(() => answerOptions.slice(0, numOptions.value));
+        const choices = ref(['','','','','']);
+
+        watch(correctAnswer, (to, from) => {
+            if(to && to !== from) correctAnswer.value = null;
+        });
 
         const classSchema = computed(() => yup.object({
             name: yup.string().required('Please enter a name'),
@@ -103,18 +132,53 @@ export default {
             question: yup.string().required('Please enter a question'),
             responseType: yup.string().required('Please select a response type').typeError('Please select a response type'),
             status: yup.string().required('Please select a status').typeError('Please select a status'),
+            numOptions: yup.number().integer(),
+            correctAnswer: yup.string().nullable(),
+            option1: yup.string().required('Option 1 is required'),
+            option2: yup.string().when('numOptions', {
+                is: (numOptions) => numOptions >= 2,
+                then: yup.string().required('Option 2 is required'),
+            }),
+            option3: yup.string().when('numOptions', {
+                is: (numOptions) => numOptions >= 3,
+                then: yup.string().required('Option 3 is required'),
+            }),
+            option4: yup.string().when('numOptions', {
+                is: (numOptions) => numOptions >= 4,
+                then: yup.string().required('Option 4 is required'),
+            }),
+            option5: yup.string().when('numOptions', {
+                is: (numOptions) => numOptions == 5,
+                then: yup.string().required('Option 5 is required'),
+            }),
         }));
 
-        const addClass = () => {
-            console.log(`Adding class ${name.value}`);
-        };
-        const addQuestion = () => {
-            console.log(`Adding question for class ${className.value}`);
-        };
+        const formattedQuestion = computed(() => {
+            const returnObject = {
+                question: question.value,
+                className: className.value,
+                status: status.value,
+                responseType: responseType.value,
+            };
+            if (responseType.value === 'Free Response') return returnObject;
+            returnObject.choices = choices.value.slice(0, numOptions.value);
+            if (correctAnswer.value) {
+                // Convert from 'Option x' to the actual option
+                const answerIndex = correctAnswerOptions.value.findIndex((option) => option === correctAnswer.value);
+                returnObject.correctAnswer = choices.value[answerIndex];
+            }
+            return returnObject;
+        });
+
+        const addClass = () => store.dispatch('addClassPeriod', { name: name.value });
+        const addQuestion = () => store.dispatch('addQuestion', formattedQuestion.value);
 
         return {
             addClass,
             addQuestion,
+            choices,
+            correctAnswer,
+            correctAnswerOptions,
             className,
             classSchema,
             classOptions: computed(() => store.state.classPeriods),
