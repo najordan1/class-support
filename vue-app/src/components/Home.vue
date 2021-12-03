@@ -75,6 +75,7 @@ export default {
             name: yup.string().required("Please enter a display name"),
         }));
         const professorSchema = computed(() => yup.object({
+            // probably a yup.password()??
             password: yup.string().required("Please enter your password"),
         }))
 
