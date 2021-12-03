@@ -6,6 +6,7 @@ const schema = new Schema({
     question: { type: String, required: true },
     responseType: { type: String, required: true },
     status: { type: String, required: true },
+    choices: { type: [String], required: false },
     correctAnswer: { type: String, required: false },
 });
 
