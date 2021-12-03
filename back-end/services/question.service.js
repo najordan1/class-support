@@ -6,7 +6,7 @@ const ClassPeriod = db.ClassPeriod;
 // Functions that we return
 module.exports = {
     addQuestion,
-    getAllQuestions,
+    getQuestionsForClassPeriod,
 };
 // Makes new entry into ClassPeriod
 // Controllers call these functions
@@ -40,6 +40,18 @@ async function addQuestion(newQuestion) {
     
 };
 
-async function getAllQuestions() {
-    return await Question.find().populate('classPeriod');
+async function getQuestionsForClassPeriod(classPeriodName) {
+
+    console.log(`getting questions for: ${classPeriodName}`);
+
+    // We need to find the class period id for the given class name
+    let classPeriod;
+    try {
+        const classPeriodObject = await ClassPeriod.findOne({ name: classPeriodName })
+        classPeriod = classPeriodObject._id;
+    } catch {
+        throw `Could not find class period ${classPeriodName}`
+    }
+
+    return await Question.find({ classPeriod: classPeriod });
 };
