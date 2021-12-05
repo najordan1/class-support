@@ -40,7 +40,7 @@ export default createStore({
         },
         async getQuestions({ commit }, { classPeriod }) {
             const questions = await axios.get(`question/getQuestions/${classPeriod}`);
-            commit('setQuestions', questions?.data?.map((item) => item.question));
+            commit('setQuestions', questions?.data);
         },
         setDisplayName({ commit }, { name }) {
             commit('setDisplayName', name);
