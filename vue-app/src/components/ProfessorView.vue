@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="row justify-content-center">
-            <div class="col-xs-12 col-sm-4">
+            <div class="col-xs-12 col-sm-6">
                 <div class="card">
                     <div class="card-header">
                         <span>Questions</span>
@@ -14,7 +14,10 @@
                         <span v-else>No questions found. Add one below!</span>
                     </div>
                     <ul v-else-if="questions.length" class="list-group list-group-flush">
-                        <li v-for="(question, index) in questions" :key="index" class="list-group-item">{{question}}</li>
+                        <li v-for="(item, index) in questions" :key="index" :class="['list-group-item', 'list-group-item-action', {'active': selectedQuestion?.question === item.question}]" v-on:click="selectedQuestion = item">
+                            <circle-icon :class="{'text-success': item.status === 'Open', 'text-danger': item.status === 'Closed' || item.status === 'Hidden'}" />
+                            {{item.question}}
+                        </li>
                     </ul>
                     <div class="card-footer d-flex justify-content-end">
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
@@ -23,13 +26,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-8">
-                <div class="card">
+            <div class="col-xs-12 col-sm-6">
+                <div v-if="selectedQuestion" class="card">
                     <div class="card-header">
-                        I feel like the question itself could go here?
+                        Responses: {{selectedQuestion.question}}
                     </div>
                     <div class="card-body">
-                        Here is where you can answer, see graphs and stuff idk
+                        Question is of type {{selectedQuestion.responseType}}
                     </div>
                 </div>
             </div>
@@ -56,8 +59,12 @@ export default {
         const classPeriod = ref(null); // vue-multiselect needs null to start usually
         onMounted(() => store.dispatch('getClassPeriods'));
 
+        const selectedQuestion = ref(null);
         watch(classPeriod, (to, from) => {
-            if (to && to !== from) store.dispatch('getQuestions', { classPeriod: classPeriod.value });
+            if (to && to !== from) {
+                store.dispatch('getQuestions', { classPeriod: classPeriod.value });
+                selectedQuestion.value = null;
+            }
         });
 
         return { 
@@ -65,7 +72,13 @@ export default {
             classPeriod,
             classOptions: computed(() => store.state.classPeriods),
             questions: computed(() => store.state.questions),
+            selectedQuestion,
         };
     },
 };
 </script>
+<style scoped>
+    .list-group-item.list-group-item-action:not(.active) {
+        cursor: pointer;
+    }
+</style>
