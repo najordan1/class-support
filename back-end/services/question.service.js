@@ -8,7 +8,7 @@ module.exports = {
     addQuestion,
     getQuestionsForClassPeriod,
 };
-// Makes new entry into ClassPeriod
+// Makes new entry into Question
 // Controllers call these functions
 async function addQuestion(newQuestion) {
     console.log(`adding question: ${newQuestion.question}`);
