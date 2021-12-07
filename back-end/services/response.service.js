@@ -29,10 +29,6 @@ async function addResponse(newResponse) {
     console.log(question);
 
     if (!question) throw `Could not find question ${newResponse.question}`;
-
-    if (await Response.findOne({ question: question, answer: newResponse.answer })) {
-        throw `Response: ${newResponse.answer} for question ${newResponse.question} already exists`
-    }
     
     const response = { ...newResponse };
     const dbresponse = new Response(response);

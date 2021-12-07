@@ -53,5 +53,5 @@ async function getQuestionsForClassPeriod(classPeriodName) {
         throw `Could not find class period ${classPeriodName}`
     }
 
-    return await Question.find({ classPeriod: classPeriod });
+    return await Question.find({ classPeriod: classPeriod }).select('-correctAnswer');
 };
