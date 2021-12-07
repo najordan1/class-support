@@ -6,4 +6,6 @@ module.exports = {
     ClassPeriod: require('../models/ClassPeriod.model'),
     Question: require('../models/Question.model'),
     Student: require('../models/Student.model'),
+    Response: require('../models/Response.model'),
+    MCResponse: require('../models/MCResponse.model'),
 };
