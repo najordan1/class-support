@@ -12,7 +12,10 @@ export default {
   name: 'App',
   components: {
     navbar,
-  }
+  },
+  created() {
+    document.title="Class Support";
+  },
 }
 </script>
 
