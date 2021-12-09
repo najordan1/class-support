@@ -3,12 +3,19 @@ const mcresponseService = require('../services/mcresponse.service');
 module.exports = {
     addMCResponse,
     getMCResponsesforQuestion,
+    aggregateMCResponses,
 };
 
 // req, res, next follows express.js syntax - lookup for info
 function addMCResponse(req, res, next) {
     mcresponseService.addMCResponse(req.body)
         .then((correctAnswer) => res.status(201).send({correctAnswer}))
+        .catch((err) => res.status(500).send(err));
+};
+
+function aggregateMCResponses(req, res, next) {
+    mcresponseService.aggregateMCResponses(req.params.question)
+        .then((counts) => res.json(counts))
         .catch((err) => res.status(500).send(err));
 };
 

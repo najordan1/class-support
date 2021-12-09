@@ -7,6 +7,7 @@ const Question = db.Question;
 module.exports = {
     addMCResponse,
     getMCResponsesforQuestion,
+    aggregateMCResponses,
 };
 // Makes new entry into MCResponse
 // Controllers call these functions
@@ -55,4 +56,25 @@ async function getMCResponsesforQuestion(question) {
     }
 
     return await MCResponse.find({ question: q });
+};
+
+async function aggregateMCResponses(question) {
+
+    console.log(`aggregating responses for: ${question}`);
+
+    const responses = await getMCResponsesforQuestion(question);
+
+    var counts = responses.reduce((p, c) => {
+        var answer = c.answer;
+
+        if (!p.hasOwnProperty(answer)) {
+          p[answer] = 0;
+        }
+
+        p[answer]++;
+        
+        return p;
+    }, {});
+
+    return counts;
 };
