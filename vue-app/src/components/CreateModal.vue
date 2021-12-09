@@ -50,14 +50,14 @@
                             <div class="form-group col">
                                 <label for="status" class="form-label">Status *</label>
                                 <Field id="status" v-slot="{value, handleChange, meta}" v-model="question.status" name="status">
-                                    <vue-multiselect :model-value="value" :options="statusOptions" open-direction="bottom" :class="[{'is-invalid': meta.touched && !meta.valid}]" v-on:update:model-value="handleChange" />
+                                    <vue-multiselect :model-value="value" :options="statusOptions" :class="[{'is-invalid': meta.touched && !meta.valid}]" v-on:update:model-value="handleChange" />
                                 </Field>
                                 <ErrorMessage name="status" class="invalid-feedback" />
                             </div>
                             <div class="form-group col">
                                 <label for="responseType" class="form-label">Response Type *</label>
                                 <Field id="responseType" v-slot="{value, handleChange, meta}" v-model="question.responseType" name="responseType">
-                                    <vue-multiselect :model-value="value" :options="responseTypeOptions" open-direction="bottom" :class="[{'is-invalid': meta.touched && !meta.valid}]" v-on:update:model-value="handleChange" />
+                                    <vue-multiselect :model-value="value" :options="responseTypeOptions" :class="[{'is-invalid': meta.touched && !meta.valid}]" v-on:update:model-value="handleChange" />
                                 </Field>
                                 <ErrorMessage name="responseType" class="invalid-feedback" />
                             </div>
@@ -74,9 +74,8 @@
                                 <div class="form-group col">
                                     <label for="correctAnswer" class="form-label">Correct Answer (optional)</label>
                                     <Field id="correctAnswer" v-slot="{value, handleChange, meta}" v-model="question.correctAnswer" name="correctAnswer">
-                                        <vue-multiselect :model-value="value" :options="correctAnswerOptions" open-direction="bottom" :class="[{'is-invalid': meta.touched && !meta.valid}]" v-on:update:model-value="handleChange" />
+                                        <vue-multiselect :model-value="value" :options="correctAnswerOptions" :multiple="question.responseType === 'Multiple Choice'" open-direction="bottom" :class="[{'is-invalid': meta.touched && !meta.valid}]" v-on:update:model-value="handleChange" />
                                     </Field>
-                                    <ErrorMessage name="correctAnswer" />
                                 </div>
                             </div>
                             <div class="row">
@@ -146,9 +145,12 @@ export default {
         const question = ref({ ...defaultQuestion });
 
         // Computed here is needed for the watch, which can't watch a property of a ref(object)
-        const correctAnswer = computed(() => question.value.correctAnswer);
-        watch(correctAnswer, (to, from) => {
-            if(to && to !== from) question.value.correctAnswer = null;
+        const responseType = computed(() => question.value.responseType);
+        watch(responseType, (to, from) => {
+            if(to && to !== from) {
+                question.value.correctAnswer = null;
+                question.value.choices = ['','','','',''];
+            }
         });
 
         const classSchema = computed(() => yup.object({
@@ -160,7 +162,6 @@ export default {
             responseType: yup.string().required('Please select a response type').typeError('Please select a response type'),
             status: yup.string().required('Please select a status').typeError('Please select a status'),
             numOptions: yup.number().integer(),
-            correctAnswer: yup.string().nullable(),
             option1: yup.string().when('responseType', {
                 is: (responseType) => responseType && responseType !== 'Free Response',
                 then: yup.string().required('Option 1 is required'),
@@ -194,8 +195,17 @@ export default {
             returnObject.choices = question.value.choices.slice(0, question.value.numOptions);
             if (question.value.correctAnswer) {
                 // Convert from 'Option x' to the actual option
-                const answerIndex = correctAnswerOptions.value.findIndex((option) => option === question.value.correctAnswer);
-                returnObject.correctAnswer = question.value.choices[answerIndex];
+                if (returnObject.responseType === 'Single Choice') {
+                    const answerIndex = correctAnswerOptions.value.findIndex((option) => option === question.value.correctAnswer);
+                    returnObject.correctAnswer = [question.value.choices[answerIndex]];
+                } else {
+                    const choices = [];
+                    question.value.correctAnswer.forEach((choice) => {
+                        const answerIndex = correctAnswerOptions.value.findIndex((option) => option === choice);
+                        choices.push(question.value.choices[answerIndex]);
+                    })
+                    returnObject.correctAnswer = choices;
+                }
             }
             return returnObject;
         });

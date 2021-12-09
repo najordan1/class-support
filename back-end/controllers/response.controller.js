@@ -9,7 +9,7 @@ module.exports = {
 // req, res, next follows express.js syntax - lookup for info
 function addResponse(req, res, next) {
     responseService.addResponse(req.body)
-        .then(() => res.status(201).send({}))
+        .then((correctAnswer) => res.status(201).json({answer: correctAnswer}))
         .catch((err) => res.status(500).send(err));
 };
 

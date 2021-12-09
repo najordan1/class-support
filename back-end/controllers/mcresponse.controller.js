@@ -8,7 +8,7 @@ module.exports = {
 // req, res, next follows express.js syntax - lookup for info
 function addMCResponse(req, res, next) {
     mcresponseService.addMCResponse(req.body)
-        .then((correctAnswer) => res.status(201).send({correctAnswer}))
+        .then((correctAnswer) => res.status(201).json({answer: correctAnswer}))
         .catch((err) => res.status(500).send(err));
 };
 
