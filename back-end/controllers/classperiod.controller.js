@@ -3,12 +3,19 @@ const classPeriodService = require('../services/classperiod.service');
 module.exports = {
     addClassPeriod,
     getAllClassPeriods,
+    removeClassPeriod,
 };
 
 // req, res, next follows express.js syntax - lookup for info
 function addClassPeriod(req, res, next) {
-    classPeriodService.addClassPeriod(req.body.name)
-        .then(() => res.send({}))
+    classPeriodService.addClassPeriod(req.body)
+        .then(() => res.status(201).send({}))
+        .catch((err) => res.status(500).send(err));
+};
+
+function removeClassPeriod(req, res, next) {
+    classPeriodService.removeClassPeriod(req.params.classPeriod)
+        .then(() => res.status(204).send({}))
         .catch((err) => res.status(500).send(err));
 };
 

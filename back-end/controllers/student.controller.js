@@ -7,6 +7,6 @@ module.exports = {
 // req, res, next follows express.js syntax - lookup for info
 function addStudent(req, res, next) {
     questionService.addStudent(req.body.name)
-        .then(() => res.send({}))
+        .then(() => res.status(201).send({}))
         .catch((err) => res.status(500).send(err));
 };

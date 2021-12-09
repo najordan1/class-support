@@ -7,6 +7,7 @@ const Question = db.Question;
 module.exports = {
     addResponse,
     getResponsesforQuestion,
+    aggregateResponses,
 };
 // Makes new entry into Response
 // Controllers call these functions
@@ -51,4 +52,25 @@ async function getResponsesforQuestion(question) {
     }
 
     return await Response.find({ question: q });
+};
+
+async function aggregateResponses(question) {
+
+    console.log(`aggregating responses for: ${question}`);
+
+    const responses = await getResponsesforQuestion(question);
+
+    var counts = responses.reduce((p, c) => {
+        var answer = c.answer;
+
+        if (!p.hasOwnProperty(answer)) {
+          p[answer] = 0;
+        }
+
+        p[answer]++;
+        
+        return p;
+    }, {});
+
+    return counts;
 };

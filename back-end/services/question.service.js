@@ -2,11 +2,16 @@
 const db = require('../helpers/database');
 const Question = db.Question;
 const ClassPeriod = db.ClassPeriod;
+const Response = db.Response;
+const MCResponse = db.MCResponse;
 
 // Functions that we return
 module.exports = {
     addQuestion,
     getQuestionsForClassPeriod,
+    removeQuestion,
+    updateQStatus,
+    updateQTitle,
 };
 // Makes new entry into Question
 // Controllers call these functions
@@ -37,6 +42,34 @@ async function addQuestion(newQuestion) {
     const dbquestion = new Question(question);
     
     return await dbquestion.save();
+    
+};
+
+async function removeQuestion(questionID) {
+    console.log(`removing question with id: ${questionID}`);
+
+    await Response.deleteMany({question: questionID});
+    await MCResponse.deleteMany({question: questionID});
+    
+    return await Question.deleteOne({ _id: questionID });
+    
+};
+
+async function updateQStatus(questionID, status) {
+    console.log(`updating question status with id: ${questionID}`);
+
+    const update = { status: status };
+    
+    return await Question.findByIdAndUpdate(questionID, update);
+    
+};
+
+async function updateQTitle(questionID, title) {
+    console.log(`updating question title with id: ${questionID}`);
+
+    const update = { question: title };
+    
+    return await Question.findByIdAndUpdate(questionID, update);
     
 };
 
