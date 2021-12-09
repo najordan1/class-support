@@ -15,7 +15,7 @@ function addResponse(req, res, next) {
 
 function aggregateResponses(req, res, next) {
     responseService.aggregateResponses(req.params.question)
-        .then(() => res.status(200).send({}))
+        .then((counts) => res.json(counts))
         .catch((err) => res.status(500).send(err));
 };
 
