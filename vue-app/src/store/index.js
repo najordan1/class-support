@@ -10,10 +10,15 @@ export default createStore({
         classPeriods: [],
         displayName: '',
         questions: [],
+        // for students, store what questions they've responded to
+        responses: [],
     },
     mutations: {
         addClassPeriod(state, name) {
             state.classPeriods.push(name);
+        },
+        addResponse(state, response) {
+            state.responses.push(response);
         },
         setClassPeriods(state, classPeriods) {
             state.classPeriods = classPeriods;
@@ -33,6 +38,17 @@ export default createStore({
         },
         async addQuestion(state, body){
             await axios.post('question/add', body);
+        },
+        async addResponse({ commit }, { question, responseType, answer }) {
+            let correctAnswer;
+            if (responseType === 'Multiple Choice') {
+                await axios.post('mcresponse/add', { answer, question })
+                    .then((r) => correctAnswer = r.data.answer);
+            } else {
+                await axios.post('response/add', { answer, question })
+                    .then((r) => correctAnswer = r.data.answer);
+            }
+            commit('addResponse', { answer, question, correctAnswer });
         },
         async getClassPeriods({ commit }) {
             const options = await axios.get('class/getAll');

@@ -18,9 +18,9 @@ async function addResponse(newResponse) {
     }
 
     // We need to find the question id for the given question
-    let question;
+    let question, questionObject;
     try {
-        const questionObject = await Question.findOne({ _id: newResponse.question })
+        questionObject = await Question.findOne({ _id: newResponse.question })
         question = questionObject._id;
     } catch {
         throw `Could not find question ${newResponse.question}`
@@ -33,7 +33,13 @@ async function addResponse(newResponse) {
     const response = { ...newResponse };
     const dbresponse = new Response(response);
     
-    return await dbresponse.save();
+    try {
+        await dbresponse.save();
+    } catch {
+        throw `Could not save response`
+    }
+
+    return questionObject.correctAnswer ? questionObject.correctAnswer : "";
     
 };
 

@@ -37,7 +37,7 @@ async function addMCResponse(newMCResponse) {
         throw `Could not save response`
     }
 
-    return questionObject.correctAnswer ?? "";
+    return questionObject.correctAnswer ? questionObject.correctAnswer : "";
     
 };
 
