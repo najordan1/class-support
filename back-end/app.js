@@ -7,7 +7,6 @@ app.use(cors());
 
 app.use('/class', require('./routes/classperiod.router'));
 app.use('/question', require('./routes/question.router'));
-app.use('/student', require('./routes/student.router'));
 app.use('/response', require('./routes/response.router'));
 app.use('/mcresponse', require('./routes/mcresponse.router'));
 app.get('/', (req, res) => {

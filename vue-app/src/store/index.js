@@ -12,6 +12,8 @@ export default createStore({
         questions: [],
         // for students, store what questions they've responded to
         responses: [],
+        // for professor, see all/aggregated responses per question
+        allResponses: {},
     },
     mutations: {
         addClassPeriod(state, name) {
@@ -19,6 +21,12 @@ export default createStore({
         },
         addResponse(state, response) {
             state.responses.push(response);
+        },
+        removeQuestion(state, question) {
+            state.questions = state.questions.filter((q) => q._id !== question);
+        },
+        setAllResponses(state, { question, responses }) {
+            state.allResponses[question] = responses;
         },
         setClassPeriods(state, classPeriods) {
             state.classPeriods = classPeriods;
@@ -29,6 +37,14 @@ export default createStore({
         setQuestions(state, questions) {
             state.questions = questions;
         },
+        toggleQuestionStatus(state, { question, status }) {
+            const questionIndex = state.questions.findIndex((q) => q._id === question);
+            state.questions[questionIndex].status = status;
+        },
+        toggleQuestionTitle(state, { question, title }) {
+            const questionIndex = state.questions.findIndex((q) => q._id === question);
+            state.questions[questionIndex].question = title;
+        }
     },
     // every component can call actions
     actions: {
@@ -50,6 +66,10 @@ export default createStore({
             }
             commit('addResponse', { answer, question, correctAnswer });
         },
+        async deleteQuestion({ commit }, { question }) {
+            await axios.delete(`question/remove/${question}`);
+            commit('removeQuestion', question);
+        },
         async getClassPeriods({ commit }) {
             const options = await axios.get('class/getAll');
             commit('setClassPeriods', options?.data?.map((item) => item.name));
@@ -58,8 +78,28 @@ export default createStore({
             const questions = await axios.get(`question/getQuestions/${classPeriod}`);
             commit('setQuestions', questions?.data);
         },
+        async getResponses({ commit }, { question, responseType }) {
+            let responses;
+            if (responseType === 'Free Response') {
+                responses = await axios.get(`response/getResponses/${question}`);
+                responses = responses?.data.map((r) => r.answer);
+            } else {
+                if (responseType === 'Single Choice') responses = await axios.get(`response/aggregateResponses/${question}`);
+                else responses = await axios.get(`mcresponse/aggregateMCResponses/${question}`);
+                responses = responses?.data;
+            }
+            commit('setAllResponses', { question, responses });
+        },
         setDisplayName({ commit }, { name }) {
             commit('setDisplayName', name);
+        },
+        async updateQuestionStatus({ commit }, { question, status }) {
+            await axios.patch(`question/updateStatus/${question}/${status}`);
+            commit('toggleQuestionStatus', { question, status });
+        },
+        async updateQuestionTitle({ commit }, { question, title }) {
+            await axios.patch(`question/updateTitle/${question}/${title}`);
+            commit('toggleQuestionTitle', { question, title });
         },
     },
 });
