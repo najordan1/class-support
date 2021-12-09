@@ -7,7 +7,7 @@ const schema = new Schema({
     responseType: { type: String, required: true }, // Free Response, Multiple Choice, Single Choice
     status: { type: String, required: true },
     choices: { type: [String], required: false },
-    correctAnswer: { type: String, required: false },
+    correctAnswer: { type: [String], required: false },
 });
 
 schema.index({ classPeriod:1, question:1 }, { unique: true });
