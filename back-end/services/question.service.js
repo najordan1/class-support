@@ -55,21 +55,21 @@ async function removeQuestion(questionID) {
     
 };
 
-async function updateQStatus(questionID, status) {
-    console.log(`updating question status with id: ${questionID}`);
+async function updateQStatus(body) {
+    console.log(`updating question status with id: ${body.questionID}`);
 
-    const update = { status: status };
+    const update = { status: body.status };
     
-    return await Question.findByIdAndUpdate(questionID, update);
+    return await Question.findByIdAndUpdate(body.questionID, update);
     
 };
 
-async function updateQTitle(questionID, title) {
-    console.log(`updating question title with id: ${questionID}`);
+async function updateQTitle(body) {
+    console.log(`updating question title with id: ${body.questionID}`);
 
-    const update = { question: title };
+    const update = { question: body.title };
     
-    return await Question.findByIdAndUpdate(questionID, update);
+    return await Question.findByIdAndUpdate(body.questionID, update);
     
 };
 

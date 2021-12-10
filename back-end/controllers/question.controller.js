@@ -22,13 +22,13 @@ function removeQuestion(req, res, next) {
 };
 
 function updateQStatus(req, res, next) {
-    questionService.updateQStatus(req.params.qID, req.params.status)
+    questionService.updateQStatus(req.body)
         .then(() => res.status(204).send({}))
         .catch((err) => res.status(500).send(err));
 };
 
 function updateQTitle(req, res, next) {
-    questionService.updateQTitle(req.params.qID, req.params.title)
+    questionService.updateQTitle(req.body)
         .then(() => res.status(204).send({}))
         .catch((err) => res.status(500).send(err));
 };
