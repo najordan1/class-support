@@ -7,7 +7,10 @@
                         <span>Questions</span>
                     </div>
                     <div class="card-body">
-                        <vue-multiselect id="test" v-model="classPeriod" :options="classOptions" placeholder="Select a class period" />
+                        <div class="input-group">
+                            <vue-multiselect id="test" v-model="classPeriod" :options="classOptions" placeholder="Select a class period" />
+                            <button v-if="classPeriod" type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteClassModal">Delete</button>
+                        </div>
                     </div>
                     <div v-if="!classPeriod || !questions?.length" class="card-body">
                         <span v-if="!classPeriod">Please select a class</span>
@@ -20,9 +23,11 @@
                         </li>
                     </ul>
                     <div class="card-footer d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
-                            Add
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button v-if="selectedQuestion" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+                            <button v-if="selectedQuestion" type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#createModal">Add</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,14 +47,8 @@
                                 </li>
                             </ul>
                         </div>
-                        <div v-else>
+                        <div v-else-if="selectedResponses">
                             <bar-chart :values="selectedResponses" />
-                        </div>
-                    </div>
-                    <div class="card-footer d-flex justify-content-end">
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
                         </div>
                     </div>
                 </div>
@@ -59,8 +58,11 @@
         <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
             <create-modal />
         </div>
+        <div class="modal fade" id="deleteClassModal" tabindex="-1" aria-labelledby="deleteClassModalLabel" aria-hidden="true">
+            <delete-class-modal v-on:deleteClass="deleteClass()" />
+        </div>
         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <delete-modal v-on:deleteQuestion="deleteQuestion" />
+            <delete-modal v-on:deleteQuestion="deleteQuestion()" />
         </div>
         <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
             <edit-modal :question="selectedQuestion ?? {}" />
@@ -72,6 +74,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import createModal from './Modals/CreateModal.vue';
+import deleteClassModal from './Modals/DeleteClassModal.vue';
 import deleteModal from './Modals/DeleteModal.vue';
 import editModal from './Modals/EditModal.vue';
 import barChart from './BarChart.vue';
@@ -81,6 +84,7 @@ export default {
     components: {
         barChart,
         createModal,
+        deleteClassModal,
         deleteModal,
         editModal,
     },
@@ -111,9 +115,14 @@ export default {
             store.dispatch('deleteQuestion', { question: selectedQuestion.value._id });
             selectedQuestion.value = null;
         };
+        const deleteClass = () => {
+            store.dispatch('deleteClass', { className: classPeriod.value });
+            classPeriod.value = null;
+        }
 
         return { 
             name: computed(() => store.state.displayName),
+            deleteClass,
             deleteQuestion,
             classPeriod,
             classOptions: computed(() => store.state.classPeriods),
@@ -127,5 +136,8 @@ export default {
 <style scoped>
     .list-group-item.list-group-item-action:not(.active) {
         cursor: pointer;
+    }
+    .multiselect {
+        width: 80%;
     }
 </style>

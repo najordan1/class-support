@@ -14,7 +14,7 @@ function addClassPeriod(req, res, next) {
 };
 
 function removeClassPeriod(req, res, next) {
-    classPeriodService.removeClassPeriod(req.params.classPeriod)
+    classPeriodService.removeClassPeriod(req.params.className)
         .then(() => res.status(204).send({}))
         .catch((err) => res.status(500).send(err));
 };

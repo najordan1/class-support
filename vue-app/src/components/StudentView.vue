@@ -57,7 +57,7 @@
                                     <Field id="singleChoice" v-slot="{field, meta}" v-model="singleChoice" name="singleChoice">
                                         <div v-for="(choice, index) in selectedQuestion.choices" :key="index" class="form-check">
                                             <label class="form-check-label" :for="`radio-${index}`">
-                                                <span v-if="selectedResponse && selectedResponse.correctAnswer">
+                                                <span v-if="selectedResponse && selectedResponse.correctAnswer.length">
                                                     <check-icon v-if="selectedResponse.correctAnswer.includes(choice)" class="text-success" />
                                                     <close-icon v-else class="text-danger" />
                                                 </span>
@@ -79,7 +79,7 @@
                         <div v-else-if="selectedQuestion.responseType === 'Multiple Choice'">
                             <div v-for="(choice, index) in selectedQuestion.choices" :key="index" class="form-check">
                                 <label class="form-check-label" :for="`check-${index}`">
-                                    <span v-if="selectedResponse && selectedResponse.correctAnswer">
+                                    <span v-if="selectedResponse && selectedResponse.correctAnswer.length">
                                         <check-icon v-if="selectedResponse.correctAnswer.includes(choice)" class="text-success" />
                                         <close-icon v-else class="text-danger" />
                                     </span>
