@@ -67,12 +67,13 @@ async function aggregateMCResponses(question) {
     var counts = responses.reduce((p, c) => {
         var answer = c.answer;
 
-        if (!p.hasOwnProperty(answer)) {
-          p[answer] = 0;
-        }
-
-        p[answer]++;
-        
+        answer.forEach(a => {
+            if (!p.hasOwnProperty(a)) {
+                p[a] = 0;
+              }
+      
+              p[a]++;
+        });
         return p;
     }, {});
 
