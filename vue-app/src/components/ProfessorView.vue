@@ -42,7 +42,9 @@
                                 </li>
                             </ul>
                         </div>
-                        <span v-else>{{selectedResponses}}</span>
+                        <div v-else>
+                            <bar-chart :values="selectedResponses" />
+                        </div>
                     </div>
                     <div class="card-footer d-flex justify-content-end">
                         <div class="btn-group" role="group">
@@ -72,10 +74,12 @@ import { useStore } from 'vuex';
 import createModal from './Modals/CreateModal.vue';
 import deleteModal from './Modals/DeleteModal.vue';
 import editModal from './Modals/EditModal.vue';
+import barChart from './BarChart.vue';
 
 export default {
     name: 'professor-view',
     components: {
+        barChart,
         createModal,
         deleteModal,
         editModal,
