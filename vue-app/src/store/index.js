@@ -22,6 +22,9 @@ export default createStore({
         addResponse(state, response) {
             state.responses.push(response);
         },
+        removeClass(state, className) {
+            state.classPeriods = state.classPeriods.filter((c) => c !== className)
+        },
         removeQuestion(state, question) {
             state.questions = state.questions.filter((q) => q._id !== question);
         },
@@ -66,6 +69,10 @@ export default createStore({
             }
             commit('addResponse', { answer, question, correctAnswer });
         },
+        async deleteClass({ commit }, { className }) {
+            await axios.delete(`class/remove/${className}`);
+            commit('removeClass', className);
+        },
         async deleteQuestion({ commit }, { question }) {
             await axios.delete(`question/remove/${question}`);
             commit('removeQuestion', question);
@@ -94,11 +101,11 @@ export default createStore({
             commit('setDisplayName', name);
         },
         async updateQuestionStatus({ commit }, { question, status }) {
-            await axios.patch(`question/updateStatus/${question}/${status}`);
+            await axios.patch(`question/updateStatus`, { questionID: question, status });
             commit('toggleQuestionStatus', { question, status });
         },
         async updateQuestionTitle({ commit }, { question, title }) {
-            await axios.patch(`question/updateTitle/${question}/${title}`);
+            await axios.patch(`question/updateTitle`, { questionID: question, title });
             commit('toggleQuestionTitle', { question, title });
         },
     },

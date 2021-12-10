@@ -29,10 +29,14 @@ async function addClassPeriod(param) {
 };
 
 // Removes entry from ClassPeriod by ID
-async function removeClassPeriod(classPeriod) {
-    console.log(`removing class period: ${classPeriod}`);
+async function removeClassPeriod(className) {
+    console.log(`removing class period: ${className}`);
+    const classObject = await ClassPeriod.findOne({ name: className });
+    const classPeriod = classObject._id;
 
-    const questions = await Question.find({ classPeriod: classPeriod });
+    console.log(classPeriod);
+
+    const questions = await Question.find({ classPeriod });
 
     qs = questions.map(item => item._id);
 

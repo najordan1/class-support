@@ -3,6 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editModalLabel">Edit: {{question.question}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <Form v-if="mode === 'edit'" novalidate autocomplete="off" :validation-schema="validationSchema" v-on:submit="submit">
