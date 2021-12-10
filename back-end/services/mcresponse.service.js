@@ -76,6 +76,22 @@ async function aggregateMCResponses(question) {
         });
         return p;
     }, {});
+    
+    let choices;
+    try {
+        const questionObject = await Question.findOne({ _id: question })
+        choices = questionObject.choices;
+    } catch {
+        throw `Could not find question ${question}`
+    }
+
+    if (!choices.length == 0) {
+        choices.forEach(choice => {
+            if (!counts.hasOwnProperty(choice)) {
+                counts[choice] = 0;
+            }
+        });
+    }
 
     return counts;
 };
